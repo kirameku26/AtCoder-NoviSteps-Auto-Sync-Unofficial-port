@@ -1,14 +1,12 @@
-# AtCoder NoviSteps Auto Sync
+# AtCoder NoviSteps Auto Sync (Unofficial Port)
 
-AtCoder での AC 状況を、[AtCoder NoviSteps](https://atcoder-novisteps.vercel.app/) へ自動的に同期するための Chrome 拡張機能（非公式）です。
+AtCoder での AC 状況を、[AtCoder NoviSteps](https://atcoder-novisteps.vercel.app/) へ自動的に同期するための ユーザースクリプト（非公式）です。
 
 ---
 
 ## 開発の背景
 
-[AtCoder NoviSteps](https://atcoder-novisteps.vercel.app/) は、けんちょん（@drken）さんを始めとする有志の方々や、スポンサーの方々の尽力によって運営されている、競プロ学習者にとって最高の「道標」です。人力で丁寧に選定された解法分けやレベル分けは、新人コーダーが次の一歩（入緑）を踏み出すために欠かせない存在となっています。
-
-この素晴らしいロードマップをよりスムーズに活用したい、そして「精進そのものに全神経を集中させたい」という想いから、自動同期ツールを作成しました。
+AtCoder NoviSteps Auto Syncを使おうと思いましたが、ユーザースクリプトに実装した場合、導入が簡単になることや、私のように諸事情でChromeのデベロッパー モードが使えない場合があるからです
 
 ---
 
@@ -25,20 +23,15 @@ AtCoder での AC 状況を、[AtCoder NoviSteps](https://atcoder-novisteps.verc
 
 ---
 
-## 使い方（デベロッパーモードでの導入）
+## 使い方（Tampermonkeyでの導入）
 
-1. このリポジトリを ZIP でダウンロードし、解凍します。
+1. [このユーザースクリプト](https://example.com/)をダウンロードします。
 
-   ![GitHubからZIPでダウンロードする](images/01_github_download.png)
+2. `Tampermonkey` を開いた欄にある `ユーザー名の設定 (AtCoder NoviSteps Auto Sync)` を開き、**自分の AtCoder ID を入力してOKボタンを押してください（この手順を忘れると正常に動作しません）。**
 
-2. `content.js` の冒頭にある `const USER_ID = "あなたのID";` を、**自分の AtCoder ID に書き換えて保存してください（この手順を忘れると正常に動作しません）。**
+   ![IDを入力する設定欄](<images/01_USER_ID_settings.png>)
 
-   ![あなたのIDを入力する](<images/03_input _USER_ID.png>)
-
-3. Chrome で `chrome://extensions/` を開きます。
-4. 「デベロッパーモード」を ON にし、「パッケージ化されていない拡張機能を読み込む」からフォルダを選択してください。
-
-   ![chrome://extensionsで拡張機能を読み込む](images/02_chrome_extensions_menu.png)
+   ![あなたのIDを入力する](<images/02_input_USER_ID.png>)
 
 > ⚠️ **注意:** `USER_ID` を書き換えずに使用した場合、同期は正常に機能しません。必ず手順2を実行してください。
 
@@ -71,6 +64,7 @@ AtCoder での AC 状況を、[AtCoder NoviSteps](https://atcoder-novisteps.verc
 - **[AtCoder NoviSteps](https://atcoder-novisteps.vercel.app/)** 様（発起人：@drken1215 様、および開発メンバーの皆様）
 - **[AtCoder Problems](https://kenkoooo.com/atcoder/)** 様（@kenkoooo 様）
 - **[AtCoder](https://atcoder.jp/)** 様（AtCoder株式会社 様）
+- **[リプトン](https://github.com/kuruton3910)** 様（@Rptonn 様）
 
 ---
 

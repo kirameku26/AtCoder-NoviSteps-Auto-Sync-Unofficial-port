@@ -1,8 +1,209 @@
+// ==UserScript==
+// @name         AtCoder NoviSteps Auto Sync (Unofficial Port)
+// @namespace    http://tampermonkey.net/
+// @version      1.0.0
+// @description  try to take over the world!
+// @author       kirameku
+// @match        https://atcoder-novisteps.vercel.app/*
+// @license      MIT
+// @icon         https://atcoder.jp/favicon.ico
+// @grant        GM_getValue
+// @grant        GM_registerMenuCommand
+// @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
+// @grant        GM_addStyle
+// ==/UserScript==
+
 (async function () {
   "use strict";
+  GM_addStyle(`
+@keyframes ns-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  const USER_ID = ""; // ここに AtCoder ID を入力
-  const STORAGE_KEY = `synced_ids_${USER_ID}`;
+@keyframes ns-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes ns-btn-appear {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#ns-sync-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  padding: 11px 24px;
+  background: #5cb88a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 10px rgba(34, 197, 94, 0.18);
+  transition: all 0.2s ease;
+  overflow: hidden;
+  animation: ns-btn-appear 0.3s ease;
+}
+
+#ns-sync-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+}
+
+#ns-sync-btn:not(:disabled):active {
+  transform: translateY(0);
+}
+
+#ns-sync-btn.ns-busy {
+  cursor: wait;
+  opacity: 0.85;
+}
+
+#ns-sync-progress {
+  display: block;
+  width: 0%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 0 0 10px 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+.ns-toast {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  z-index: 999998;
+  padding: 12px 20px;
+  max-width: 320px;
+  border: 1px solid;
+  border-radius: 10px;
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-line;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  animation: ns-slide-up 0.25s ease;
+}
+
+.ns-toast-success {
+  background: #ecfdf5;
+  border-color: #86efac;
+  color: #065f46;
+}
+
+.ns-toast-error {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.ns-toast-info {
+  background: #f0f9ff;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+
+.ns-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ns-slide-up 0.2s ease;
+}
+
+.ns-confirm-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 32px;
+  max-width: 340px;
+  width: 88%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+}
+
+.ns-confirm-message {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #374151;
+  white-space: pre-line;
+}
+
+.ns-confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.ns-confirm-btn {
+  padding: 9px 26px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+
+.ns-confirm-btn-secondary {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.ns-confirm-btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.ns-confirm-btn-primary {
+  background: #22c55e;
+  color: #fff;
+}
+
+.ns-confirm-btn-primary:hover {
+  background: #16a34a;
+}
+`);
+  var _GM_getValue = (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_registerMenuCommand = (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
+  var _GM_setValue = (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
+
+  let USER_ID = _GM_getValue("atcoder_user_id", ""); // ここに AtCoder ID を入力
+  const STORAGE_KEY = `synced`;
   const SYNC_RESULT_KEY = "sync_result";
   const TOAST_DURATION_MS = 4000;
   const TOAST_FADE_DURATION_MS = 250;
@@ -28,6 +229,23 @@
       NOVISTEPS_REQUEST_DELAY_JITTER_MS,
     );
 
+  function init() {
+    _GM_registerMenuCommand("ユーザー名の設定 (AtCoder NoviSteps Auto Sync)", () => {
+      const currentN = _GM_getValue("atcoder_user_id", "");
+      const input = prompt(
+        "あなたのAtCoderのユーザーidを入力してください:",
+        String(currentN)
+      );
+      console.log(input);
+      if (input !== null && input.trim() !== "") {
+        const newN = input;
+        _GM_setValue("atcoder_user_id", newN);
+        alert("ユーザーIDを保存しました: " + newN);
+      }
+    });
+    USER_ID = _GM_getValue("atcoder_user_id", "");
+  }
+
   function createSyncRequestBody(problemId) {
     const formData = new FormData();
     formData.append("taskId", problemId);
@@ -45,16 +263,32 @@
     ];
   }
 
+  function gmFetch(url) {
+    return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: url,
+            onload: function(response) {
+                // fetch の response.ok と同等のチェック
+                if (response.status >= 200 && response.status < 300) {
+                    resolve(response);
+                } else {
+                    reject(new Error(`Failed to fetch submissions: ${response.status}`));
+                }
+            },
+            onerror: function(error) {
+                reject(error);
+            }
+        });
+    });
+  }
+
   async function fetchAcceptedProblemIds(userId, fromSecond) {
-    const response = await fetch(
-      `${ATCODER_SUBMISSIONS_API}?user=${encodeURIComponent(userId)}&from_second=${fromSecond}`,
-    );
+    const url = `${ATCODER_SUBMISSIONS_API}?user=${encodeURIComponent(userId)}&from_second=${fromSecond}`;
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch submissions: ${response.status}`);
-    }
+    const response = await gmFetch(url);
 
-    const submissions = await response.json();
+    const submissions = JSON.parse(response.responseText);
 
     const maxEpochSecond = submissions.reduce(
       (max, item) => Math.max(max, item.epoch_second),
@@ -195,6 +429,7 @@
   // 同期ボタンの注入
   // ========================================
   function injectSyncButton() {
+
     if (document.getElementById("ns-sync-btn") || !document.body) return;
 
     const btn = document.createElement("button");
@@ -225,7 +460,7 @@
     btn.addEventListener("click", async () => {
       if (!USER_ID) {
         showToast(
-          "AtCoder ID が設定されていません。\ncontent.js の USER_ID を確認してください。",
+          "AtCoder ID が設定されていません。\nユーザー名の設定 を確認してください。",
           "error",
         );
         return;
@@ -291,7 +526,13 @@
     document.body.appendChild(btn);
   }
 
-  injectSyncButton();
+  // 初回ボタン注入
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", injectSyncButton);
+  else{
+      init();
+      injectSyncButton();
+  }
+
   new MutationObserver(injectSyncButton).observe(document.documentElement, {
     childList: true,
     subtree: true,
