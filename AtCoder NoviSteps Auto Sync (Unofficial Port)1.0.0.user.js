@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         AtCoder NoviSteps Auto Sync (Unofficial Port)
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
-// @description  try to take over the world!
+// @version      1.0.1
+// @description  This tool automatically syncs your AtCoder acceptance (AC) status with AtCoder NoviSteps.
 // @author       kirameku
 // @match        https://atcoder-novisteps.vercel.app/*
+// @supportURL   https://github.com/kirameku26/AtCoder-NoviSteps-Auto-Sync-Unofficial-port
 // @license      MIT
 // @icon         https://atcoder.jp/favicon.ico
 // @grant        GM_getValue
@@ -12,6 +13,8 @@
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @grant        GM_addStyle
+// @downloadURL https://update.greasyfork.org/scripts/579674/AtCoder%20NoviSteps%20Auto%20Sync%20%28Unofficial%20Port%29.user.js
+// @updateURL https://update.greasyfork.org/scripts/579674/AtCoder%20NoviSteps%20Auto%20Sync%20%28Unofficial%20Port%29.meta.js
 // ==/UserScript==
 
 (async function () {
@@ -527,14 +530,17 @@
   }
 
   // 初回ボタン注入
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", injectSyncButton);
+  if (document.readyState === "loading"){
+      if(!document.contentType.includes('application/json')) document.addEventListener("DOMContentLoaded", injectSyncButton);
+  }
   else{
       init();
-      injectSyncButton();
+      if(!document.contentType.includes('application/json')) injectSyncButton();
   }
-
-  new MutationObserver(injectSyncButton).observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-  });
+  if(!document.contentType.includes('application/json')) {
+      new MutationObserver(injectSyncButton).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+      });
+  }
 })();
