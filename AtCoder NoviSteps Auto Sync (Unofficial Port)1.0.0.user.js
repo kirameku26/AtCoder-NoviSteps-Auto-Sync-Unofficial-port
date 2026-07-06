@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         AtCoder NoviSteps Auto Sync (Unofficial Port)
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
 // @description  This tool automatically syncs your AtCoder acceptance (AC) status with AtCoder NoviSteps.
 // @author       kirameku
 // @match        https://atcoder-novisteps.vercel.app/*
 // @supportURL   https://github.com/kirameku26/AtCoder-NoviSteps-Auto-Sync-Unofficial-port
 // @license      MIT
-// @icon         https://atcoder.jp/favicon.ico
+// @icon         https://atcoder-novisteps.vercel.app/favicon.png
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_setValue
